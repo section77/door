@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <style>
+      table {
+        border: 1px solid black;
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+    </style>
+  </head>
+  <body ng-app="door">
+    <div ng-controller="MainCtrl as mainCtrl">
+      <h1>{{mainCtrl.state}}</h1>
+  
+      <button ng-click="mainCtrl.open()">open</button>
+      <button ng-click="mainCtrl.close()">close</button>
+    
+      <hr/>
+      <table>
+        <tr ng-repeat="h in mainCtrl.history">
+          <td>{{h[0]}}</td>
+          <td>{{h[1]}}</td>
+        </tr>
+       </table>
+    </div>
+    <script src="/angular.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
