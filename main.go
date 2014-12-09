@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	state   = "keine ahnung!"
 	history [][]string
 )
 
@@ -23,18 +22,21 @@ func main() {
 }
 
 func openHndl(w http.ResponseWriter, r *http.Request) {
-	state = "open"
-	addToHistory("open event")
+	addToHistory("open")
 	pwm(20)
 }
 
 func closeHndl(w http.ResponseWriter, r *http.Request) {
-	state = "close"
-	addToHistory("close event")
+	addToHistory("close")
 	pwm(80)
 }
 
 func stateHndl(w http.ResponseWriter, r *http.Request) {
+	state := "keine ahnung!"
+	if len(history) > 0 {
+		// pfusch!!
+		state = history[len(history)-1][1]
+	}
 	fmt.Fprintf(w, "state: %s", state)
 }
 
