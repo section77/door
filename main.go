@@ -25,15 +25,13 @@ func main() {
 func openHndl(w http.ResponseWriter, r *http.Request) {
 	state = "open"
 	addToHistory("open event")
-	dur, _ := time.ParseDuration("500us")
-	servo(dur)
+	pwm(20)
 }
 
 func closeHndl(w http.ResponseWriter, r *http.Request) {
 	state = "close"
 	addToHistory("close event")
-	dur, _ := time.ParseDuration("2ms")
-	servo(dur)
+	pwm(80)
 }
 
 func stateHndl(w http.ResponseWriter, r *http.Request) {
@@ -44,22 +42,6 @@ func historyHndl(w http.ResponseWriter, r *http.Request) {
 	j, _ := json.Marshal(history)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
-}
-
-func servo(duration time.Duration) {
-	GPIOOpen()
-	time.Sleep(500 * time.Millisecond)
-
-	GPIOLow()
-	for i := 0; i < 50; i++ {
-		GPIOHigh()
-		time.Sleep(duration)
-
-		GPIOLow()
-		time.Sleep(10 * time.Millisecond)
-	}
-
-	GPIOClose()
 }
 
 func addToHistory(msg string) {

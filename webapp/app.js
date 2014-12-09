@@ -25,6 +25,6 @@ door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
     });
   }
 
-  $interval(update, 5000);
+  $interval(update, 1000);
   update();
 }]);
