@@ -6,6 +6,7 @@ package main
 // #include <bcm2835.h>
 import "C"
 import "errors"
+import "time"
 
 func pwm(value int) error {
 	//
@@ -14,7 +15,6 @@ func pwm(value int) error {
 	if C.bcm2835_init() == 0 {
 		return errors.New("unable to initialize bcm2835")
 	}
-	defer C.bcm2835_close()
 
 	C.bcm2835_gpio_fsel(C.RPI_V2_GPIO_P1_12, C.BCM2835_GPIO_FSEL_ALT5)
 	C.bcm2835_pwm_set_clock(C.BCM2835_PWM_CLOCK_DIVIDER_512)
@@ -29,6 +29,12 @@ func pwm(value int) error {
 
 	// bcm2835_pwm_set_data(channel, value)
 	C.bcm2835_pwm_set_data(0, C.uint32_t(value))
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		C.bcm2835_gpio_fsel(C.RPI_V2_GPIO_P1_12, C.BCM2835_GPIO_FSEL_OUTP)
+		C.bcm2835_close()
+	}()
 
 	return nil
 }
