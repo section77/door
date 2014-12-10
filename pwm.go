@@ -1,3 +1,5 @@
+// +build arm
+
 package main
 
 // #cgo LDFLAGS: -lbcm2835

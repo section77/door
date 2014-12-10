@@ -12,17 +12,22 @@ door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
     });
   };
 
-
-  self.open = function(){
-    $http.get("/open").then(function(){
+  function callEndpointAndUpdateState(endpoint){
+    $http.get(endpoint).then(function(){
       self.updateState();
     });
   }
 
+  self.toggle = function(){
+    callEndpointAndUpdateState("/toggle")
+  }
+                             
+  self.open = function(){
+    callEndpointAndUpdateState("/open")
+  }
+
   self.close = function(){
-    $http.get("/close").then(function(){
-      self.updateState();
-    });
+    callEndpointAndUpdateState("/close")
   }
 
   $interval(update, 1000);

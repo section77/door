@@ -8,11 +8,32 @@ import (
 )
 
 var (
+	state   State
 	history [][]string
 )
 
+type State int
+
+const (
+	Unknow State = iota
+	Open
+	Close
+)
+
+func (s State) String() string {
+	str := "- unknow -"
+	switch s {
+	case Open:
+		str = "open"
+	case Close:
+		str = "close"
+	}
+	return str
+}
+
 func main() {
 	http.Handle("/", http.FileServer(http.Dir("webapp")))
+	http.HandleFunc("/toggle", toggleHndl)
 	http.HandleFunc("/open", openHndl)
 	http.HandleFunc("/close", closeHndl)
 	http.HandleFunc("/state", stateHndl)
@@ -21,22 +42,30 @@ func main() {
 	fmt.Println(http.ListenAndServe(":80", nil))
 }
 
+func toggleHndl(w http.ResponseWriter, r *http.Request) {
+	switch state {
+	case Open:
+		closeHndl(w, r)
+	case Close:
+		openHndl(w, r)
+	default:
+		fmt.Fprintf(w, "aktueller status: '%s' - mach nix!", state)
+	}
+}
+
 func openHndl(w http.ResponseWriter, r *http.Request) {
-	addToHistory("open")
+	state = Open
+	addToHistory("open event")
 	pwm(20)
 }
 
 func closeHndl(w http.ResponseWriter, r *http.Request) {
-	addToHistory("close")
+	state = Close
+	addToHistory("close event")
 	pwm(80)
 }
 
 func stateHndl(w http.ResponseWriter, r *http.Request) {
-	state := "keine ahnung!"
-	if len(history) > 0 {
-		// pfusch!!
-		state = history[len(history)-1][1]
-	}
 	fmt.Fprintf(w, "state: %s", state)
 }
 

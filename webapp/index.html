@@ -11,7 +11,8 @@
   <body ng-app="door">
     <div ng-controller="MainCtrl as mainCtrl">
       <h1>{{mainCtrl.state}}</h1>
-  
+
+      <button ng-click="mainCtrl.toggle()">toggle</button>
       <button ng-click="mainCtrl.open()">open</button>
       <button ng-click="mainCtrl.close()">close</button>
     
