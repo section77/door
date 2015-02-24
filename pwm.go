@@ -7,8 +7,13 @@ package main
 import "C"
 import "errors"
 import "time"
+import "sync"
+
+var lock = sync.Mutex{}
 
 func pwm(value int) error {
+	lock.Lock()
+
 	//
 	// init bcm2835 / configure for pwm
 	//
@@ -34,6 +39,8 @@ func pwm(value int) error {
 		time.Sleep(2 * time.Second)
 		C.bcm2835_gpio_fsel(C.RPI_V2_GPIO_P1_12, C.BCM2835_GPIO_FSEL_OUTP)
 		C.bcm2835_close()
+
+		lock.Unlock()
 	}()
 
 	return nil
