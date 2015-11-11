@@ -3,11 +3,11 @@ var door = angular.module('door', []);
 door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
   var self = this;
 
-  function update(){
-    $http.get("/state").then(function(res){
+  function updateState(){
+    $http.get("state").then(function(res){
       self.state = res.data;
     });
-    $http.get("/history").then(function(res){
+    $http.get("history").then(function(res){
       self.history = res.data;
     });
   };
@@ -19,17 +19,17 @@ door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
   }
 
   self.toggle = function(){
-    callEndpointAndUpdateState("/toggle")
+    callEndpointAndUpdateState("toggle")
   }
                              
   self.open = function(){
-    callEndpointAndUpdateState("/open")
+    callEndpointAndUpdateState("open")
   }
 
   self.close = function(){
-    callEndpointAndUpdateState("/close")
+    callEndpointAndUpdateState("close")
   }
 
-  $interval(update, 1000);
-  update();
+  $interval(updateState, 5000);
+  updateState();
 }]);
