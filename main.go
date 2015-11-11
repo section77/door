@@ -21,7 +21,7 @@ const (
 )
 
 func (s State) String() string {
-	str := "- unknow -"
+	str := "- unknown -"
 	switch s {
 	case Open:
 		str = "open"
@@ -38,8 +38,8 @@ func main() {
 	http.HandleFunc("/close", closeHndl)
 	http.HandleFunc("/state", stateHndl)
 	http.HandleFunc("/history", historyHndl)
-	fmt.Println("listen on :80")
-	fmt.Println(http.ListenAndServe(":80", nil))
+	fmt.Println("listen on 127.0.0.1:8000")
+	fmt.Println(http.ListenAndServe("127.0.0.1:8000", nil))
 }
 
 func toggleHndl(w http.ResponseWriter, r *http.Request) {
