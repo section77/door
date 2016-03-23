@@ -14,3 +14,6 @@ func pwm(value int) error {
 	fmt.Printf("dummy pwm - value: %d\n", value)
 	return nil
 }
+
+func reactOnBtnEvent() {
+}
