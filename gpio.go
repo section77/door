@@ -19,6 +19,39 @@ func init() {
 	go reactOnBtnEvent()
 }
 
+func enableUMTSStick(enable bool) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	//
+	// open the library
+	//
+	if C.bcm2835_init() == 0 {
+		// bcm2835_init prints the failure reason on stderr
+		fmt.Println("bcm2835 init error")
+		os.Exit(1)
+	}
+	defer C.bcm2835_close()
+
+	//
+	// configure port
+	//
+
+	// output
+	C.bcm2835_gpio_fsel(C.RPI_V2_GPIO_P1_15, C.BCM2835_GPIO_FSEL_OUTP)
+
+	// action
+	if enable {
+		log.Println("enable UMTS - Stick")
+		C.bcm2835_gpio_write(C.RPI_V2_GPIO_P1_15, C.HIGH)
+	} else {
+		log.Println("disable UMTS - Stick")
+		C.bcm2835_gpio_write(C.RPI_V2_GPIO_P1_15, C.LOW)
+	}
+
+	return nil
+}
+
 func pwm(value int) error {
 	lock.Lock()
 	defer lock.Unlock()

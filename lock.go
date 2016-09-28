@@ -32,12 +32,14 @@ func (s State) String() string {
 func lockOpen() {
 	state = Open
 	addToHistory("open event")
+	enableUMTSStick(true)
 	pwm(20)
 }
 
 func lockClose() {
 	state = Close
 	addToHistory("close event")
+	enableUMTSStick(false)
 	pwm(80)
 }
 
