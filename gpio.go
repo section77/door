@@ -105,9 +105,12 @@ func reactOnBtnEvent() {
 			log.Println("ignore")
 		default:
 			// toggle
-			log.Println("toggel")
-			// toggle async to prevent deadlock
-			go lockToggle()
+			log.Println("delay toggel ....")
+			go func() {
+				time.Sleep(10 * time.Second)
+				log.Println("toogle!")
+				lockToggle()
+			}()
 		}
 	}
 
