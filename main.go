@@ -1,41 +1,38 @@
+// entry point for the application
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
+	"flag"
+	"time"
 )
+
+var dl DoorLock
 
 func main() {
 
-	http.Handle("/", http.FileServer(http.Dir("webapp")))
-	http.HandleFunc("/toggle", toggleHndl)
-	http.HandleFunc("/open", openHndl)
-	http.HandleFunc("/close", closeHndl)
-	http.HandleFunc("/state", stateHndl)
-	http.HandleFunc("/history", historyHndl)
-	fmt.Println("listen on 127.0.0.1:8000")
-	fmt.Println(http.ListenAndServe("127.0.0.1:8000", nil))
-}
+	// args
+	var printHelp = flag.Bool("h", false, "print this help")
+	var ip = flag.String("ip", "127.0.0.1", "bind the embedded webserver to the given ip address")
+	var port = flag.Int("port", 8000, "bind the embedded webserver to the given port")
 
-func toggleHndl(w http.ResponseWriter, r *http.Request) {
-	lockToggle()
-}
+	var keepInternet = flag.Bool("keep-internet", false, "keep the internet on")
+	var maxHistoryEntries = flag.Int("max-history", 50, "keep at most 'n' entries in the history")
 
-func openHndl(w http.ResponseWriter, r *http.Request) {
-	lockOpen()
-}
+	var btnMinPushDur = flag.Duration("btn-min-push", 500*time.Millisecond, "minimum push duration for the button to react")
+	var btnLockDelayDur = flag.Duration("btn-lock-delay", 10*time.Second, "delay duration to lock the door when triggered per button")
 
-func closeHndl(w http.ResponseWriter, r *http.Request) {
-	lockClose()
-}
+	flag.Parse()
 
-func stateHndl(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "state: %s", state)
-}
+	// action
+	if *printHelp {
+		flag.Usage()
+	} else {
+		dl = NewDoorLock(*keepInternet, *maxHistoryEntries)
 
-func historyHndl(w http.ResponseWriter, r *http.Request) {
-	j, _ := json.Marshal(history)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+		// start button listener
+		startButtonObserverLoop(*btnMinPushDur, *btnLockDelayDur)
+
+		// startup the webserver
+		startWebapp(*ip, *port)
+	}
 }

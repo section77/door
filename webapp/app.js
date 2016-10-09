@@ -8,7 +8,7 @@ door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
       self.state = res.data;
     });
     $http.get("history").then(function(res){
-      self.history = res.data;
+      self.history = res.data.slice().reverse();
     });
   };
 
@@ -30,6 +30,6 @@ door.controller('MainCtrl', ['$http', '$interval', function($http, $interval){
     callEndpointAndUpdateState("close")
   }
 
-  $interval(updateState, 5000);
+  $interval(updateState, 1000);
   updateState();
 }]);
