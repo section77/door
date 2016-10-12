@@ -8,14 +8,26 @@ package gpio
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"time"
 )
 
 /*
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <termios.h>
+
+void echo(){
+   struct termios old = {0};
+   fflush(stdout);
+   if( tcgetattr(0, &old) < 0 ) perror("tcsetattr()");
+   old.c_lflag |= ICANON;
+   old.c_lflag |= ECHO;
+   if( tcsetattr(0, TCSANOW, &old) < 0 ) perror("tcsetattr ICANON");
+}
 
 void noecho(){
    struct termios old = {0};
@@ -60,7 +72,24 @@ int kbhit() {
 import "C"
 
 func init() {
-	C.noecho()
+	// disable console echo
+	go func() {
+		// HACK (this is only for dev / test, so i'm fine with this here)
+		// wait 1 second before disable echo
+		// (do prevent disable console echo if the app exits after startup (-h flag))
+		time.Sleep(time.Second * 1)
+		C.noecho()
+	}()
+
+	// re-enable console echo on exit (Ctrl-C)
+	e := make(chan os.Signal, 1)
+	signal.Notify(e, os.Interrupt)
+	go func() {
+		for _ = range e {
+			C.echo()
+			os.Exit(0)
+		}
+	}()
 }
 
 func Read(pin Pin) (LowOrHigh, error) {
