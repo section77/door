@@ -110,15 +110,18 @@ func BlockWhileIsLow(pin Pin) (bool, time.Duration, error) {
 	}
 	defer C.bcm2835_close()
 
+	// configure the port for input
+	C.bcm2835_gpio_fsel(C.uint8_t(pin), C.BCM2835_GPIO_FSEL_INPT)
+	// with a pullup
+	C.bcm2835_gpio_fsel(C.uint8_t(pin), C.BCM2835_GPIO_PUD_UP)
+
 	var blockWhileIsLow = func() (bool, time.Duration) {
 		isLow := false
 		start := time.Now()
-		for C.bcm2835_gpio_eds(C.uint8_t(pin)) == 1 {
-			C.bcm2835_gpio_set_eds(C.uint8_t(pin)) // clear the eds flag
+		for C.bcm2835_gpio_lev(C.uint8_t(pin)) == C.LOW {
 			isLow = true
 			time.Sleep(100 * time.Millisecond)
 		}
-		C.bcm2835_gpio_set_eds(C.uint8_t(pin)) // clear the eds flag
 		return isLow, time.Since(start)
 	}
 
